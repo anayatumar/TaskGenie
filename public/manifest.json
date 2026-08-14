@@ -1,0 +1,27 @@
+{
+  "short_name": "TaskGenie",
+  "name": "TaskGenie Voice AI Assistant",
+  "description": "Voice-First Executive AI Assistant for Tasks, Notes, Team Management & Reminders",
+  "icons": [
+    {
+      "src": "/mascot.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
+  "display": "standalone",
+  "orientation": "portrait",
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}
