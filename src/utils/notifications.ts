@@ -83,6 +83,9 @@ export function playAlarmSound(soundType: AlarmSoundType = 'chime', enableVibrat
     if (!AudioCtx) return;
 
     const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
 
     if (soundType === 'chime') {
       // Gentle Bell Chime (E5 -> G5 -> C6)
@@ -92,7 +95,7 @@ export function playAlarmSound(soundType: AlarmSoundType = 'chime', enableVibrat
         const gain = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, ctx.currentTime + index * 0.15);
-        gain.gain.setValueAtTime(0.35, ctx.currentTime + index * 0.15);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime + index * 0.15);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + index * 0.15 + 0.6);
         osc.connect(gain);
         gain.connect(ctx.destination);
@@ -178,8 +181,8 @@ export function triggerSystemNotification(
       try {
         new Notification(`TaskGenie: ${title}`, {
           body,
-          icon: '/favicon.ico',
-          tag: `tg_${Date.now()}`,
+          icon: '/mascot.png',
+          tag: `tg_${targetId || Date.now()}`,
         });
       } catch (e) {
         console.warn('Browser notification popup failed:', e);
@@ -204,33 +207,57 @@ export function triggerSystemNotification(
   return newNotif;
 }
 
-// 15-Second Interval Due Reminder Monitor
+// Helper: Normalize time string "02:13", "2:13", "02:13 AM", "14:13" to total minutes of day
+function parseTimeToMinutes(timeStr?: string): number | null {
+  if (!timeStr) return null;
+  const cleaned = timeStr.trim().toLowerCase();
+  const match = cleaned.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+  if (!match) return null;
+
+  let hrs = parseInt(match[1], 10);
+  const mins = parseInt(match[2], 10);
+  const ampm = match[3];
+
+  if (ampm === 'pm' && hrs < 12) hrs += 12;
+  if (ampm === 'am' && hrs === 12) hrs = 0;
+
+  return hrs * 60 + mins;
+}
+
+// Bulletproof Reminder & Sound Alarm Monitor (Supports exact time, 1-minute window, and overdue triggers)
 export function checkAndTriggerDueReminders(
   tasks: Task[],
   settings?: MobileNotificationSettings
 ): AppNotification[] {
   const now = new Date();
   const currentDateStr = now.toISOString().split('T')[0];
-  const currentHours = String(now.getHours()).padStart(2, '0');
-  const currentMins = String(now.getMinutes()).padStart(2, '0');
-  const currentTimeStr = `${currentHours}:${currentMins}`;
+  const currentTotalMins = now.getHours() * 60 + now.getMinutes();
 
   const triggered: AppNotification[] = [];
   const currentSettings = settings || getStoredMobileNotificationSettings();
 
   tasks.forEach((t) => {
-    if (t.status !== 'completed' && t.dueDate === currentDateStr && t.dueTime === currentTimeStr) {
-      const notifKey = `reminded_${t.id}_${currentDateStr}_${currentTimeStr}`;
-      if (!sessionStorage.getItem(notifKey)) {
-        sessionStorage.setItem(notifKey, 'true');
-        const notif = triggerSystemNotification(
-          `🔔 TASK REMINDER ALARM`,
-          `Due Now: ${t.title} (${t.dueTime})`,
-          'reminder',
-          currentSettings,
-          t.id
-        );
-        triggered.push(notif);
+    if (t.status !== 'completed') {
+      const taskDate = t.dueDate || currentDateStr;
+      const taskMins = parseTimeToMinutes(t.dueTime);
+
+      // Trigger if date matches today (or passed) AND task due time has arrived or passed
+      const isDateDueOrPassed = taskDate <= currentDateStr;
+      const isTimeDueOrPassed = taskMins !== null ? taskMins <= currentTotalMins : true;
+
+      if (isDateDueOrPassed && isTimeDueOrPassed) {
+        const notifKey = `reminded_${t.id}`;
+        if (!sessionStorage.getItem(notifKey)) {
+          sessionStorage.setItem(notifKey, 'true');
+          const notif = triggerSystemNotification(
+            `🔔 TASK DUE ALARM`,
+            `Due Now: ${t.title} (${t.dueTime || 'Today'})`,
+            'reminder',
+            currentSettings,
+            t.id
+          );
+          triggered.push(notif);
+        }
       }
     }
   });

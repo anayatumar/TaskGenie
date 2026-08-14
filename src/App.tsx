@@ -138,9 +138,9 @@ export function App() {
     }
   }, []);
 
-  // Automated 15-second Reminder & Sound Alarm Monitor
+  // Automated 3-second Reminder & Sound Alarm Monitor (Ultra-Fast Instant Trigger)
   useEffect(() => {
-    const interval = setInterval(() => {
+    const checkReminders = () => {
       if (tasks.length > 0) {
         const mobileSettings = getStoredMobileNotificationSettings();
         const triggered = checkAndTriggerDueReminders(tasks, mobileSettings);
@@ -148,8 +148,10 @@ export function App() {
           setNotifications(getStoredNotifications());
         }
       }
-    }, 15000);
+    };
 
+    checkReminders();
+    const interval = setInterval(checkReminders, 3000);
     return () => clearInterval(interval);
   }, [tasks]);
 
