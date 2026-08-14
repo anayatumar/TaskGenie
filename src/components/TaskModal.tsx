@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Task, Contact, TaskPriority, TaskCategory, TeamMember } from '../types';
 import { X, Mic, Volume2, Save, Calendar, Clock, AlertTriangle, User, ShieldAlert, Square, CheckSquare } from 'lucide-react';
 import { speechEngine } from '../utils/speech';
+import { getLocalDateString } from '../utils/timeParser';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -42,10 +43,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      const todayLocal = getLocalDateString(new Date());
       if (taskToEdit) {
         setTitle(taskToEdit.title || '');
         setDescription(taskToEdit.description || '');
-        setDueDate(taskToEdit.dueDate || new Date().toISOString().split('T')[0]);
+        setDueDate(taskToEdit.dueDate || todayLocal);
         setDueTime(taskToEdit.dueTime || '12:00');
         setPriority(taskToEdit.priority || 'normal');
         setCategory(taskToEdit.category || 'general');
@@ -56,7 +58,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       } else if (initialTask) {
         setTitle(initialTask.title || '');
         setDescription(initialTask.description || '');
-        setDueDate(initialTask.dueDate || new Date().toISOString().split('T')[0]);
+        setDueDate(initialTask.dueDate || todayLocal);
         setDueTime(initialTask.dueTime || '09:00');
         setPriority(initialTask.priority || 'normal');
         setCategory(initialTask.category || 'general');
@@ -70,7 +72,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         const mins = String(now.getMinutes()).padStart(2, '0');
         setTitle('');
         setDescription('');
-        setDueDate(now.toISOString().split('T')[0]);
+        setDueDate(getLocalDateString(now));
         setDueTime(`${hrs}:${mins}`);
         setPriority('normal');
         setCategory('general');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Task, Contact } from '../types';
 import { TaskCard } from './TaskCard';
 import { Plus, Search, CheckCircle2, Zap } from 'lucide-react';
+import { getLocalDateString } from '../utils/timeParser';
 
 interface TasksViewProps {
   tasks: Task[];
@@ -28,7 +29,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateString(new Date());
 
   const filteredTasks = tasks.filter(t => {
     const matchesSearch =
@@ -40,7 +41,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
     if (selectedCategory !== 'all' && t.category !== selectedCategory) return false;
 
     if (filterTab === 'today') {
-      return t.dueDate === todayStr && t.status !== 'completed';
+      return (!t.dueDate || t.dueDate <= todayStr) && t.status !== 'completed';
     } else if (filterTab === 'overdue') {
       return t.dueDate && t.dueDate < todayStr && t.status !== 'completed';
     } else if (filterTab === 'upcoming') {

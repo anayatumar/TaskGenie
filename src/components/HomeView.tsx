@@ -3,6 +3,7 @@ import { Task, Contact, AppLanguage, UserProfile } from '../types';
 import { Phone, CheckCircle2, Clock, ChevronRight, Edit3, TrendingUp, Sparkles, Zap, FileText, AlertCircle, Circle, Sun, Moon, Search, FileCheck, Brain } from 'lucide-react';
 import { speechEngine } from '../utils/speech';
 import { FollowUpWidget } from './FollowUpWidget';
+import { getLocalDateString } from '../utils/timeParser';
 
 interface HomeViewProps {
   user: UserProfile | null;
@@ -43,10 +44,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const pendingTasks = tasks.filter(t => t.status !== 'completed');
   const completedTasks = tasks.filter(t => t.status === 'completed');
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayTasks = pendingTasks.filter(t => t.dueDate === todayStr);
+  const todayStr = getLocalDateString(new Date());
+  const todayTasks = pendingTasks.filter(t => !t.dueDate || t.dueDate <= todayStr);
 
-  const nextUpcomingTask = pendingTasks.find(t => t.dueDate && t.dueTime) || pendingTasks[0];
+  const nextUpcomingTask = pendingTasks.find(t => t.dueDate === todayStr) || pendingTasks.find(t => t.dueDate && t.dueTime) || pendingTasks[0];
   const completionPercentage = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
   const handlePlayMorningBriefing = () => {

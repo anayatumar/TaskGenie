@@ -41,6 +41,7 @@ import { getStoredMemories } from './utils/aiMemory';
 import { handleWebShareIncoming } from './utils/whatsappShare';
 import { speechEngine } from './utils/speech';
 import { processVoiceCommand } from './utils/aiEngine';
+import { getLocalDateString } from './utils/timeParser';
 import { Header } from './components/Header';
 import { BottomNav, TabType } from './components/BottomNav';
 import { HomeView } from './components/HomeView';
@@ -286,7 +287,7 @@ export function App() {
 
     const extractedTaskData: Partial<Task> = result.extractedTask || {
       title: spokenText,
-      dueDate: new Date().toISOString().split('T')[0],
+      dueDate: getLocalDateString(new Date()),
       dueTime: '09:00',
       priority: 'normal',
       category: 'quotation',
@@ -435,7 +436,7 @@ export function App() {
         status: 'pending',
         priority: 'high',
         category: 'general',
-        dueDate: ai.dueDate || new Date().toISOString().split('T')[0],
+        dueDate: ai.dueDate || getLocalDateString(new Date()),
         contactId: matched?.id,
         contactName: ai.contactName || matched?.name,
         contactOrganization: ai.organization || matched?.organization,
@@ -660,7 +661,7 @@ export function App() {
               status: 'pending',
               priority: intentResult.extractedTask.priority || 'normal',
               category: intentResult.extractedTask.category || 'general',
-              dueDate: intentResult.extractedTask.dueDate || new Date().toISOString().split('T')[0],
+              dueDate: intentResult.extractedTask.dueDate || getLocalDateString(new Date()),
               dueTime: intentResult.extractedTask.dueTime || '17:00',
               assigneeId: intentResult.extractedTask.assigneeId,
               assigneeName: intentResult.extractedTask.assigneeName,

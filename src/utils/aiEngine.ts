@@ -1,5 +1,6 @@
 import { Task, Contact, IntentResult, AppLanguage, TeamMember, Note, AIMemory } from '../types';
 import { executeMultiStepMeetingPreparation, executeMultiStepQuotationFollowUp, routeToSkill } from './skillsEngine';
+import { getLocalDateString } from './timeParser';
 
 export interface ConversationContext {
   activeTask?: Task | null;
@@ -48,15 +49,15 @@ export async function processVoiceCommand(
 
   if (currentCtx.pendingMultiTurnIntent === 'AWAITING_DATE') {
     const partial = currentCtx.partialTaskData || {};
-    let dueDate = new Date().toISOString().split('T')[0];
+    let dueDate = getLocalDateString(new Date());
     if (textLower.includes('tomorrow') || textLower.includes('کل')) {
       const tmr = new Date();
       tmr.setDate(tmr.getDate() + 1);
-      dueDate = tmr.toISOString().split('T')[0];
+      dueDate = getLocalDateString(tmr);
     } else if (textLower.includes('friday') || textLower.includes('جمعہ')) {
       const fri = new Date();
       fri.setDate(fri.getDate() + 4);
-      dueDate = fri.toISOString().split('T')[0];
+      dueDate = getLocalDateString(fri);
     }
     partial.dueDate = dueDate;
     clearConversationContext();
@@ -102,7 +103,7 @@ export async function processVoiceCommand(
     const targetTask = currentCtx.activeTask;
     const fri = new Date();
     fri.setDate(fri.getDate() + 4);
-    const friDate = fri.toISOString().split('T')[0];
+    const friDate = getLocalDateString(fri);
 
     return {
       intent: 'UPDATE_TASK',
@@ -186,17 +187,17 @@ export async function processVoiceCommand(
   }
 
   const today = new Date();
-  let dueDate = today.toISOString().split('T')[0];
-  let dueTime = '12:00';
+  let dueDate = getLocalDateString(today);
+  let dueTime = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
 
   if (textLower.includes('tomorrow') || textLower.includes('کل')) {
     const tmr = new Date(today);
     tmr.setDate(tmr.getDate() + 1);
-    dueDate = tmr.toISOString().split('T')[0];
+    dueDate = getLocalDateString(tmr);
   } else if (textLower.includes('friday') || textLower.includes('جمعہ')) {
     const fri = new Date(today);
     fri.setDate(fri.getDate() + 4);
-    dueDate = fri.toISOString().split('T')[0];
+    dueDate = getLocalDateString(fri);
   }
 
   const timeMatch = textLower.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|بجے|baje)?/i);

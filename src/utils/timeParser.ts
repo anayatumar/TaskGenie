@@ -6,6 +6,13 @@ export interface ParsedDateTime {
   formatted: string;
 }
 
+export function getLocalDateString(d: Date = new Date()): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function parseNaturalTime(input: string): ParsedDateTime {
   const text = input.toLowerCase();
   const now = new Date();
@@ -25,7 +32,6 @@ export function parseNaturalTime(input: string): ParsedDateTime {
 
   // Check for specific weekdays
   const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const urduDays = ['itwar', 'somwar', 'mangal', 'budh', 'juma', 'hafta'];
   
   daysOfWeek.forEach((day, index) => {
     if (text.includes(day)) {
@@ -55,21 +61,19 @@ export function parseNaturalTime(input: string): ParsedDateTime {
   } else if (genericTimeMatch) {
     let hours = parseInt(genericTimeMatch[1], 10);
     const minutes = genericTimeMatch[2] ? parseInt(genericTimeMatch[2], 10) : 0;
-    // Default afternoon heuristic if hour is small like 4
     if (hours <= 6 && !text.includes('subah') && !text.includes('am')) {
       hours += 12;
     }
     timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
-  const year = targetDate.getFullYear();
-  const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
-  const day = targetDate.getDate().toString().padStart(2, '0');
-  const dateStr = `${year}-${month}-${day}`;
+  const dateStr = getLocalDateString(targetDate);
+  const todayStr = getLocalDateString(now);
 
-  // Formatted human text
-  const isToday = dateStr === `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-  const isTomorrow = targetDate.getDate() === now.getDate() + 1;
+  const isToday = dateStr === todayStr;
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(now.getDate() + 1);
+  const isTomorrow = dateStr === getLocalDateString(tomorrowDate);
 
   let formatted = dateStr;
   if (isToday) formatted = 'Today';

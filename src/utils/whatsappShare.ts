@@ -1,5 +1,6 @@
 import { processVoiceCommand } from './aiEngine';
 import { Task, Contact, TeamMember, AppLanguage } from '../types';
+import { getLocalDateString } from './timeParser';
 
 export async function handleWebShareIncoming(
   contacts: Contact[],
@@ -13,10 +14,9 @@ export async function handleWebShareIncoming(
   const urlParams = new URLSearchParams(window.location.search);
   const sharedText = urlParams.get('text') || urlParams.get('title') || urlParams.get('share');
 
-  if (sharedText && sharedText.trim().length > 0) {
-    console.log('Incoming WhatsApp / System Share Text Detected:', sharedText);
+  if (!sharedText) return;
 
-    // AI Analyzes the shared WhatsApp message
+  try {
     const result = await processVoiceCommand(
       sharedText,
       contacts,
@@ -26,26 +26,28 @@ export async function handleWebShareIncoming(
     );
 
     const newTask: Task = {
-      id: `t_share_${Date.now()}`,
+      id: `t_wa_${Date.now()}`,
       title: result.extractedTask?.title || (sharedText.length > 60 ? sharedText.substring(0, 58) + '...' : sharedText),
       description: `Shared WhatsApp Message:\n"${sharedText}"`,
       status: 'pending',
       priority: result.extractedTask?.priority || 'high',
       category: result.extractedTask?.category || 'follow_up',
-      dueDate: result.extractedTask?.dueDate || new Date().toISOString().split('T')[0],
+      dueDate: result.extractedTask?.dueDate || getLocalDateString(new Date()),
       dueTime: result.extractedTask?.dueTime || '17:00',
       contactId: result.matchedContact?.id,
       contactName: result.matchedContact?.name,
       contactOrganization: result.matchedContact?.organization,
       subtasks: [],
-      sourceWhatsAppMessage: sharedText,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     onTaskCreated(newTask);
 
-    // Clean URL parameters after importing
-    window.history.replaceState({}, document.title, window.location.pathname);
+    // Clear URL parameters after importing
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  } catch (e) {
+    console.warn('Error processing shared WhatsApp text:', e);
   }
 }

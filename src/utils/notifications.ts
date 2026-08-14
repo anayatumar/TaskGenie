@@ -1,4 +1,5 @@
 import { Task, AppNotification } from '../types';
+import { getLocalDateString } from './timeParser';
 
 export type AlarmSoundType = 'chime' | 'radar' | 'digital' | 'gong' | 'silent';
 
@@ -230,7 +231,7 @@ export function checkAndTriggerDueReminders(
   settings?: MobileNotificationSettings
 ): AppNotification[] {
   const now = new Date();
-  const currentDateStr = now.toISOString().split('T')[0];
+  const currentDateStr = getLocalDateString(now);
   const currentTotalMins = now.getHours() * 60 + now.getMinutes();
 
   const triggered: AppNotification[] = [];
@@ -241,9 +242,9 @@ export function checkAndTriggerDueReminders(
       const taskDate = t.dueDate || currentDateStr;
       const taskMins = parseTimeToMinutes(t.dueTime);
 
-      // Trigger if date matches today (or passed) AND task due time has arrived or passed
+      // Trigger if date is today or overdue AND task due time has arrived or passed
       const isDateDueOrPassed = taskDate <= currentDateStr;
-      const isTimeDueOrPassed = taskMins !== null ? taskMins <= currentTotalMins : true;
+      const isTimeDueOrPassed = taskMins !== null ? (taskDate < currentDateStr || taskMins <= currentTotalMins) : true;
 
       if (isDateDueOrPassed && isTimeDueOrPassed) {
         const notifKey = `reminded_${t.id}`;
