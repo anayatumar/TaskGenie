@@ -65,10 +65,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         setContactId(initialTask.contactId || '');
         setContactName(initialTask.contactName || '');
       } else {
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
         setTitle('');
         setDescription('');
-        setDueDate(new Date().toISOString().split('T')[0]);
-        setDueTime('12:00');
+        setDueDate(now.toISOString().split('T')[0]);
+        setDueTime(`${hrs}:${mins}`);
         setPriority('normal');
         setCategory('general');
         setAssigneeId('');
