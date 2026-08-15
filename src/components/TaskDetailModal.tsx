@@ -1,6 +1,7 @@
 import React from 'react';
 import { Task, Contact } from '../types';
-import { X, Check, Clock, Calendar, Phone, Building, MessageSquare, Trash2, Edit3, Tag, FileText, CheckSquare } from 'lucide-react';
+import { X, Check, Clock, Calendar, Phone, Building, MessageSquare, Trash2, Edit3, Tag, FileText, CheckSquare, Mail, Download, ExternalLink } from 'lucide-react';
+import { openGoogleCalendarForTask, exportTaskToCalendarICS, openGmailComposer, openWhatsAppDirect } from '../utils/integrations';
 
 interface TaskDetailModalProps {
   isOpen: boolean;
@@ -37,6 +38,27 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   };
 
   const isCompleted = task.status === 'completed';
+
+  const handleOpenGoogleCalendar = () => {
+    openGoogleCalendarForTask(task.title, task.dueDate, task.dueTime, task.description);
+  };
+
+  const handleExportICS = () => {
+    exportTaskToCalendarICS(task.title, task.dueDate, task.dueTime, task.description);
+  };
+
+  const handleOpenGmail = () => {
+    const recipient = matchedContact?.email || '';
+    const subject = `Task: ${task.title}`;
+    const body = `Hi ${task.contactName || 'Team'},\n\nRegarding: ${task.title}\nDue Date: ${task.dueDate || 'Today'} ${task.dueTime || ''}\n\nDetails:\n${task.description || ''}\n\nBest regards,\nTaskGenie AI Executive Assistant`;
+    openGmailComposer(recipient, subject, body);
+  };
+
+  const handleOpenWhatsApp = () => {
+    const phone = matchedContact?.phone || '';
+    const msg = `Hi ${task.contactName || ''}, following up regarding task: "${task.title}". Scheduled for ${task.dueDate || 'Today'} ${task.dueTime || ''}.`;
+    openWhatsAppDirect(phone, msg);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-md animate-fadeIn select-none">
@@ -90,6 +112,48 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             </div>
           </div>
 
+          {/* REAL FUNCTIONAL CONNECTORS BAR (Google Calendar, iCal, Gmail, WhatsApp) */}
+          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+              <span>Real Live Integrations</span>
+              <span className="text-[#10B981] text-[9px]">Functional Models</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleOpenGoogleCalendar}
+                className="py-2 px-2.5 rounded-xl bg-white border border-slate-200 text-[#10B981] hover:bg-emerald-50 text-[11px] font-extrabold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Google Calendar</span>
+              </button>
+
+              <button
+                onClick={handleExportICS}
+                className="py-2 px-2.5 rounded-xl bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 text-[11px] font-extrabold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download iCal</span>
+              </button>
+
+              <button
+                onClick={handleOpenGmail}
+                className="py-2 px-2.5 rounded-xl bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 text-[11px] font-extrabold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>Send via Gmail</span>
+              </button>
+
+              <button
+                onClick={handleOpenWhatsApp}
+                className="py-2 px-2.5 rounded-xl bg-white border border-slate-200 text-teal-600 hover:bg-teal-50 text-[11px] font-extrabold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>WhatsApp Direct</span>
+              </button>
+            </div>
+          </div>
+
           {/* Full Description */}
           {task.description ? (
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
@@ -133,15 +197,13 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     >
                       <Phone className="w-4 h-4" />
                     </a>
-                    <a
-                      href={`https://wa.me/${matchedContact.phone.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      onClick={handleOpenWhatsApp}
                       className="p-2 rounded-xl bg-teal-50 text-teal-600 border border-teal-200 hover:bg-teal-100 transition-colors"
                       title="WhatsApp Message"
                     >
                       <MessageSquare className="w-4 h-4" />
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
