@@ -63,12 +63,16 @@ export function setAuthSession(authenticated: boolean): void {
 }
 
 export function getStoredUserProfile(): UserProfile {
-  const data = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
-  if (!data) {
-    localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(DEFAULT_USER));
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(DEFAULT_USER));
+      return DEFAULT_USER;
+    }
+    return JSON.parse(data);
+  } catch {
     return DEFAULT_USER;
   }
-  return JSON.parse(data);
 }
 
 export function saveUserProfile(profile: UserProfile): void {
@@ -76,12 +80,16 @@ export function saveUserProfile(profile: UserProfile): void {
 }
 
 export function getStoredCompanyDetails(): CompanyDetails {
-  const data = localStorage.getItem(STORAGE_KEYS.COMPANY_DETAILS);
-  if (!data) {
-    localStorage.setItem(STORAGE_KEYS.COMPANY_DETAILS, JSON.stringify(DEFAULT_COMPANY));
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.COMPANY_DETAILS);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEYS.COMPANY_DETAILS, JSON.stringify(DEFAULT_COMPANY));
+      return DEFAULT_COMPANY;
+    }
+    return JSON.parse(data);
+  } catch {
     return DEFAULT_COMPANY;
   }
-  return JSON.parse(data);
 }
 
 export function saveCompanyDetails(company: CompanyDetails): void {
@@ -89,12 +97,16 @@ export function saveCompanyDetails(company: CompanyDetails): void {
 }
 
 export function getStoredPreferences(): UserPreferences {
-  const data = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
-  if (!data) {
-    localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(DEFAULT_PREFERENCES));
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(DEFAULT_PREFERENCES));
+      return DEFAULT_PREFERENCES;
+    }
+    return JSON.parse(data);
+  } catch {
     return DEFAULT_PREFERENCES;
   }
-  return JSON.parse(data);
 }
 
 export function savePreferences(prefs: UserPreferences): void {
@@ -135,8 +147,12 @@ export function deleteAccountAndData(): void {
 
 // Entity Storage Wrappers
 export function getStoredTasks(): Task[] {
-  const data = localStorage.getItem(STORAGE_KEYS.TASKS);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.TASKS);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveTasks(tasks: Task[]): void {
@@ -144,8 +160,12 @@ export function saveTasks(tasks: Task[]): void {
 }
 
 export function getStoredContacts(): Contact[] {
-  const data = localStorage.getItem(STORAGE_KEYS.CONTACTS);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.CONTACTS);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveContacts(contacts: Contact[]): void {
@@ -153,8 +173,12 @@ export function saveContacts(contacts: Contact[]): void {
 }
 
 export function getStoredNotes(): Note[] {
-  const data = localStorage.getItem(STORAGE_KEYS.NOTES);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.NOTES);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveNotes(notes: Note[]): void {
@@ -162,8 +186,12 @@ export function saveNotes(notes: Note[]): void {
 }
 
 export function getStoredTeam(): TeamMember[] {
-  const data = localStorage.getItem(STORAGE_KEYS.TEAM);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.TEAM);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveTeam(team: TeamMember[]): void {
