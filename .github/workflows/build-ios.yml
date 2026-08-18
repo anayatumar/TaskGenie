@@ -42,6 +42,7 @@ jobs:
                      -scheme App \
                      -configuration Release \
                      -sdk iphoneos \
+                     -derivedDataPath build \
                      CODE_SIGN_IDENTITY="" \
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGNING_ALLOWED=NO \
@@ -50,7 +51,7 @@ jobs:
       - name: Create Unsigned IPA Package
         run: |
           mkdir -p Payload
-          cp -r ios/App/build/Release-iphoneos/App.app Payload/
+          cp -r ios/App/build/Build/Products/Release-iphoneos/App.app Payload/
           zip -r TaskGenie_iOS_Unsigned.ipa Payload
 
       - name: Upload iOS App Artifact
