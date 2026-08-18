@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-30 pt-3 pb-2.5 px-4 transition-colors select-none ${
+      className={`sticky top-0 z-30 pt-safe pb-2.5 px-4 transition-colors select-none ${
         isDarkHeader
           ? 'bg-[#0F172A] text-white border-b border-slate-800'
           : 'bg-white/95 text-slate-900 border-b border-slate-200/80 backdrop-blur-md'

@@ -12,7 +12,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenSignUp,
 }) => {
   return (
-    <div className="h-[100dvh] max-h-[100dvh] bg-[#F0F4F8] text-slate-800 flex flex-col justify-between max-w-md mx-auto w-full px-5 py-3 overflow-hidden select-none animate-fadeIn">
+    <div className="h-[100dvh] max-h-[100dvh] bg-[#F0F4F8] text-slate-800 flex flex-col justify-between max-w-md mx-auto w-full px-5 pt-safe pb-safe overflow-hidden select-none animate-fadeIn">
       {/* Clean Top Header in Light Theme (Black Top Block Removed Completely) */}
       <header className="flex items-center justify-between py-1 shrink-0">
         <div className="flex items-center gap-2 text-xs font-extrabold tracking-wider text-[#10B981] uppercase">

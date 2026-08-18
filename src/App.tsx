@@ -489,7 +489,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+    <div className="min-h-dvh bg-slate-50 text-slate-800 flex flex-col font-sans">
       <Header
         user={userProfile}
         company={companyDetails}
@@ -504,7 +504,7 @@ export function App() {
         isDarkHeader={activeTab === 'home'}
       />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-safe-content">
         {activeTab === 'home' && (
           <HomeView
             user={userProfile}
